@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventus Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader {
+            border-top-color: #3498db;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen">
+
+    <!-- Top Navigation / Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Eventus
+            </h1>
+
+            <!-- Dashboard Navigation -->
+            <nav class="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                <button onclick="switchView('events')" id="nav-events"
+                    class="px-4 py-2 text-sm font-medium rounded-md bg-white shadow text-gray-900 transition-all">
+                    Event Stream
+                </button>
+                <button onclick="switchView('create')" id="nav-create"
+                    class="px-4 py-2 text-sm font-medium rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-all">
+                    Create Event
+                </button>
+            </nav>
+
+            <div class="flex items-center space-x-6 text-sm font-medium">
+                <div class="flex items-center gap-2">
+                    <span id="health-indicator" class="w-3 h-3 rounded-full bg-gray-400"></span>
+                    <span id="health-text" class="text-gray-600">Checking...</span>
+                </div>
+                <div class="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    <span id="event-count-text">Total: 0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- View 1: Events Table -->
+        <section id="view-events" class="space-y-4 block">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-900">Event Stream</h2>
+                <button onclick="fetchEvents(0)"
+                    class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" id="events-table">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                                Type</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Event Name</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Service</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">
+                                Timestamp</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Message</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-container" class="bg-white divide-y divide-gray-200">
+                        <!-- Event rows will be injected here -->
+                    </tbody>
+                </table>
+
+                <div id="loading-spinner" class="hidden justify-center py-12 w-full">
+                    <div class="loader border-4 border-gray-200 rounded-full w-8 h-8"></div>
+                </div>
+
+                <div id="empty-state" class="hidden text-center py-12 w-full">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                        </path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No events found</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by creating a new event.</p>
+                </div>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div id="pagination-controls" class="flex justify-between items-center pt-4 hidden">
+                <button id="prev-page-btn" onclick="prevPage()" disabled
+                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                    Previous
+                </button>
+                <span class="text-sm text-gray-500" id="page-indicator">Page 1</span>
+                <button id="next-page-btn" onclick="nextPage()"
+                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center gap-1">
+                    Next Page
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- View 2: Create/Edit Form -->
+        <section id="view-create" class="hidden max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6" id="form-title">Create New Event</h2>
+                <form id="event-form" class="space-y-5">
+                    <input type="hidden" id="event-id">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Event Name</label>
+                        <input type="text" id="event-name" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2.5"
+                            placeholder="e.g. User Login">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Service</label>
+                        <input type="text" id="event-service" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2.5"
+                            placeholder="e.g. auth-service">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Type</label>
+                            <select id="event-type" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2.5 bg-white">
+                                <option value="log">Log</option>
+                                <option value="error">Error</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Timestamp</label>
+                            <input type="datetime-local" id="event-timestamp" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2.5">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Message</label>
+                        <textarea id="event-message" rows="4" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2.5"
+                            placeholder="Detailed event description..."></textarea>
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" id="submit-btn"
+                            class="flex-1 justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            Save Event
+                        </button>
+                        <button type="button" id="cancel-edit-btn"
+                            class="hidden flex-1 justify-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="fixed bottom-4 right-4 transform transition-all duration-300 translate-y-20 opacity-0 bg-gray-900 text-white px-4 py-3 rounded shadow-lg flex items-center gap-3 z-50">
+        <span id="toast-message">Notification</span>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let isEditing = false;
+
+        // Pagination State
+        let currentPage = 0;
+        let pageCursors = [null]; // Stores the nextId for each page index
+
+        // Elements
+        const healthInd = document.getElementById('health-indicator');
+        const healthText = document.getElementById('health-text');
+        const countText = document.getElementById('event-count-text');
+        const eventsContainer = document.getElementById('events-container');
+        const eventsTable = document.getElementById('events-table');
+        const paginationControls = document.getElementById('pagination-controls');
+        const prevBtn = document.getElementById('prev-page-btn');
+        const nextBtn = document.getElementById('next-page-btn');
+        const pageIndicator = document.getElementById('page-indicator');
+        const spinner = document.getElementById('loading-spinner');
+        const emptyState = document.getElementById('empty-state');
+        const form = document.getElementById('event-form');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // Set default timestamp to now
+        document.getElementById('event-timestamp').value = new Date().toISOString().slice(0, 16);
+
+        // Utilities
+        function switchView(view) {
+            const navEvents = document.getElementById('nav-events');
+            const navCreate = document.getElementById('nav-create');
+            const viewEvents = document.getElementById('view-events');
+            const viewCreate = document.getElementById('view-create');
+
+            if (view === 'events') {
+                viewEvents.classList.remove('hidden');
+                viewCreate.classList.add('hidden');
+
+                navEvents.className = 'px-4 py-2 text-sm font-medium rounded-md bg-white shadow text-gray-900 transition-all';
+                navCreate.className = 'px-4 py-2 text-sm font-medium rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-all';
+
+                if (eventsContainer.children.length === 0) fetchEvents(0); // Refresh if empty
+            } else {
+                viewEvents.classList.add('hidden');
+                viewCreate.classList.remove('hidden');
+
+                navCreate.className = 'px-4 py-2 text-sm font-medium rounded-md bg-white shadow text-gray-900 transition-all';
+                navEvents.className = 'px-4 py-2 text-sm font-medium rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-all';
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.className = `fixed bottom-4 right-4 transform transition-all duration-300 translate-y-0 opacity-100 px-4 py-3 rounded shadow-lg flex items-center gap-3 z-50 ${isError ? 'bg-red-600' : 'bg-gray-900'} text-white`;
+
+            setTimeout(() => {
+                toast.classList.replace('translate-y-0', 'translate-y-20');
+                toast.classList.replace('opacity-100', 'opacity-0');
+            }, 3000);
+        }
+
+        function formatDate(isoString) {
+            return new Date(isoString).toLocaleString(undefined, {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
+        // API Calls
+        async function fetchHealth() {
+            try {
+                const res = await fetch(`${API_URL}/health`);
+                if (res.ok) {
+                    healthInd.classList.replace('bg-gray-400', 'bg-green-500');
+                    healthInd.classList.replace('bg-red-500', 'bg-green-500');
+                    healthText.textContent = 'System Healthy';
+                } else throw new Error('Unhealthy');
+            } catch (err) {
+                healthInd.classList.replace('bg-gray-400', 'bg-red-500');
+                healthInd.classList.replace('bg-green-500', 'bg-red-500');
+                healthText.textContent = 'System Offline';
+            }
+        }
+
+        async function fetchCount() {
+            try {
+                const res = await fetch(`${API_URL}/events/util/count`);
+                const data = await res.json();
+                if (res.ok) countText.textContent = `Total: ${data.count}`;
+            } catch (err) {
+                console.error('Failed to fetch count', err);
+            }
+        }
+
+        async function fetchEvents(targetPage) {
+            if (targetPage === 0) {
+                pageCursors = [null]; // Reset pagination
+            }
+
+            currentPage = targetPage;
+            const cursor = pageCursors[currentPage];
+
+            // Clear current events exactly to show max 5
+            eventsContainer.innerHTML = '';
+            eventsTable.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            paginationControls.classList.add('hidden');
+            spinner.classList.replace('hidden', 'flex');
+
+            try {
+                const url = new URL(`${API_URL}/events`);
+                if (cursor) url.searchParams.append('nextId', cursor);
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Failed to fetch events');
+
+                if (currentPage === 0 && data.events.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    eventsTable.classList.remove('hidden');
+                    data.events.forEach(event => renderEventRow(event));
+
+                    // Update Pagination State
+                    paginationControls.classList.remove('hidden');
+                    pageIndicator.textContent = `Page ${currentPage + 1}`;
+
+                    prevBtn.disabled = currentPage === 0;
+
+                    if (data.nextId) {
+                        pageCursors[currentPage + 1] = data.nextId;
+                        nextBtn.disabled = false;
+                    } else {
+                        nextBtn.disabled = true;
+                    }
+                }
+            } catch (err) {
+                showToast(err.message, true);
+            } finally {
+                spinner.classList.replace('flex', 'hidden');
+            }
+        }
+
+        function nextPage() {
+            fetchEvents(currentPage + 1);
+        }
+
+        function prevPage() {
+            if (currentPage > 0) fetchEvents(currentPage - 1);
+        }
+
+        async function saveEvent(e) {
+            e.preventDefault();
+
+            const payload = {
+                name: document.getElementById('event-name').value,
+                service: document.getElementById('event-service').value,
+                eventType: document.getElementById('event-type').value,
+                message: document.getElementById('event-message').value,
+                timestamp: new Date(document.getElementById('event-timestamp').value).toISOString()
+            };
+
+            const id = document.getElementById('event-id').value;
+            const url = isEditing ? `${API_URL}/events/${id}` : `${API_URL}/events`;
+            const method = isEditing ? 'PUT' : 'POST';
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('Validation Error or Server Error');
+
+                showToast(isEditing ? 'Event updated successfully' : 'Event created successfully');
+                resetForm();
+                fetchCount();
+
+                // Switch back to events stream and refresh to page 1
+                switchView('events');
+                fetchEvents(0);
+
+            } catch (err) {
+                showToast(err.message, true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = isEditing ? 'Update Event' : 'Save Event';
+            }
+        }
+
+        async function deleteEvent(id) {
+            if (!confirm('Are you sure you want to delete this event?')) return;
+
+            try {
+                const res = await fetch(`${API_URL}/events/${id}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete');
+
+                showToast('Event deleted');
+                fetchCount();
+
+                // Re-fetch current page to keep 5 items populated if available
+                fetchEvents(currentPage);
+
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+
+        // UI Handlers
+        function renderEventRow(event) {
+            const isError = event.eventType === 'error';
+            const row = document.createElement('tr');
+            row.id = `event-${event.id}`;
+            row.className = 'hover:bg-gray-50 transition-colors group';
+
+            const safeMessage = event.message.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${isError ? 'bg-red-100 text-red-800 uppercase tracking-wider' : 'bg-indigo-100 text-indigo-800 uppercase tracking-wider'}">
+                        ${event.eventType}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    ${event.name}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                    <span class="bg-gray-100 px-2 py-1 rounded">${event.service}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                    ${formatDate(event.timestamp)}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="${safeMessage}">
+                    ${event.message}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onclick='editEvent(${JSON.stringify(event).replace(/'/g, "&#39;")})' class="text-indigo-600 hover:text-indigo-900 mr-4 transition-colors">Edit</button>
+                    <button onclick='deleteEvent("${event.id}")' class="text-red-600 hover:text-red-900 transition-colors">Delete</button>
+                </td>
+            `;
+            eventsContainer.appendChild(row);
+        }
+
+        function editEvent(event) {
+            isEditing = true;
+            formTitle.textContent = 'Edit Event';
+            submitBtn.textContent = 'Update Event';
+            cancelEditBtn.classList.remove('hidden');
+
+            document.getElementById('event-id').value = event.id;
+            document.getElementById('event-name').value = event.name;
+            document.getElementById('event-service').value = event.service;
+            document.getElementById('event-type').value = event.eventType;
+            document.getElementById('event-message').value = event.message;
+
+            const dt = new Date(event.timestamp);
+            dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
+            document.getElementById('event-timestamp').value = dt.toISOString().slice(0, 16);
+
+            switchView('create');
+        }
+
+        function resetForm() {
+            isEditing = false;
+            form.reset();
+            document.getElementById('event-id').value = '';
+            document.getElementById('event-timestamp').value = new Date().toISOString().slice(0, 16);
+            formTitle.textContent = 'Create New Event';
+            submitBtn.textContent = 'Save Event';
+            cancelEditBtn.classList.add('hidden');
+        }
+
+        // Listeners
+        form.addEventListener('submit', saveEvent);
+        cancelEditBtn.addEventListener('click', () => {
+            resetForm();
+            switchView('events');
+        });
+
+        // Initialization
+        fetchHealth();
+        fetchCount();
+        fetchEvents(0);
+
+        // Poll health every 30 seconds
+        setInterval(fetchHealth, 30000);
+    </script>
+</body>
+
+</html>
