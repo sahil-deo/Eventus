@@ -130,5 +130,4 @@ frontend/index.html  Browser dashboard
 | `npm run build` | Compile TypeScript to `dist/` |
 | `npm start` | Start the compiled API |
 | `npm run run` | Build and start the API |
-| `npm test` | Placeholder test command; tests are not configured yet |
 
