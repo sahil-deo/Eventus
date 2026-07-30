@@ -1,8 +1,6 @@
 import { randomUUID } from "crypto";
-import type { Event } from "./model.js"
 import type { Request, Response, NextFunction } from "express"
 import { ZodType } from "zod"
-import type { ParsedQs } from "qs";
 
 export function createEvent(data: any): Event {
     return { id: randomUUID(), ...data };
