@@ -17,7 +17,7 @@ export async function getEventCount(req, res) {
 }
 // CRUD 
 export async function getAllEvents(req, res) {
-    const { nextId } = req.query;
+    const { nextId } = res.locals.query;
     if (nextId !== undefined) {
         const exists = await prisma.event.findUnique({ where: { id: nextId } });
         if (!exists) {
@@ -27,7 +27,7 @@ export async function getAllEvents(req, res) {
     const responseEvents = await prisma.event.findMany({
         take: 5,
         ...(nextId !== undefined && { skip: 1, cursor: { id: nextId } }),
-        orderBy: { timestamp: "desc" },
+        orderBy: { createdAt: "desc" },
     });
     const newNextId = responseEvents.length === 5 ? responseEvents[responseEvents.length - 1]?.id : undefined;
     const response = { events: responseEvents, nextId: newNextId };

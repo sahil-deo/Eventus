@@ -56,7 +56,8 @@ export const EventScalarFieldEnum = {
     service: 'service',
     message: 'message',
     eventType: 'eventType',
-    timestamp: 'timestamp'
+    timestamp: 'timestamp',
+    createdAt: 'createdAt'
 };
 export const SortOrder = {
     asc: 'asc',

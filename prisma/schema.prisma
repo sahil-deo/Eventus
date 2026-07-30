@@ -14,6 +14,7 @@ model Event {
   message   String
   eventType EventType
   timestamp DateTime
+  createdAt DateTime  @default(now())
 }
 
 enum EventType {

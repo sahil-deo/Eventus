@@ -18,6 +18,7 @@ export type EventMinAggregateOutputType = {
     message: string | null;
     eventType: $Enums.EventType | null;
     timestamp: Date | null;
+    createdAt: Date | null;
 };
 export type EventMaxAggregateOutputType = {
     id: string | null;
@@ -26,6 +27,7 @@ export type EventMaxAggregateOutputType = {
     message: string | null;
     eventType: $Enums.EventType | null;
     timestamp: Date | null;
+    createdAt: Date | null;
 };
 export type EventCountAggregateOutputType = {
     id: number;
@@ -34,6 +36,7 @@ export type EventCountAggregateOutputType = {
     message: number;
     eventType: number;
     timestamp: number;
+    createdAt: number;
     _all: number;
 };
 export type EventMinAggregateInputType = {
@@ -43,6 +46,7 @@ export type EventMinAggregateInputType = {
     message?: true;
     eventType?: true;
     timestamp?: true;
+    createdAt?: true;
 };
 export type EventMaxAggregateInputType = {
     id?: true;
@@ -51,6 +55,7 @@ export type EventMaxAggregateInputType = {
     message?: true;
     eventType?: true;
     timestamp?: true;
+    createdAt?: true;
 };
 export type EventCountAggregateInputType = {
     id?: true;
@@ -59,6 +64,7 @@ export type EventCountAggregateInputType = {
     message?: true;
     eventType?: true;
     timestamp?: true;
+    createdAt?: true;
     _all?: true;
 };
 export type EventAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -130,6 +136,7 @@ export type EventGroupByOutputType = {
     message: string;
     eventType: $Enums.EventType;
     timestamp: Date;
+    createdAt: Date;
     _count: EventCountAggregateOutputType | null;
     _min: EventMinAggregateOutputType | null;
     _max: EventMaxAggregateOutputType | null;
@@ -147,6 +154,7 @@ export type EventWhereInput = {
     message?: Prisma.StringFilter<"Event"> | string;
     eventType?: Prisma.EnumEventTypeFilter<"Event"> | $Enums.EventType;
     timestamp?: Prisma.DateTimeFilter<"Event"> | Date | string;
+    createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string;
 };
 export type EventOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -155,6 +163,7 @@ export type EventOrderByWithRelationInput = {
     message?: Prisma.SortOrder;
     eventType?: Prisma.SortOrder;
     timestamp?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
 };
 export type EventWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -166,6 +175,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
     message?: Prisma.StringFilter<"Event"> | string;
     eventType?: Prisma.EnumEventTypeFilter<"Event"> | $Enums.EventType;
     timestamp?: Prisma.DateTimeFilter<"Event"> | Date | string;
+    createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string;
 }, "id">;
 export type EventOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -174,6 +184,7 @@ export type EventOrderByWithAggregationInput = {
     message?: Prisma.SortOrder;
     eventType?: Prisma.SortOrder;
     timestamp?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
     _count?: Prisma.EventCountOrderByAggregateInput;
     _max?: Prisma.EventMaxOrderByAggregateInput;
     _min?: Prisma.EventMinOrderByAggregateInput;
@@ -188,6 +199,7 @@ export type EventScalarWhereWithAggregatesInput = {
     message?: Prisma.StringWithAggregatesFilter<"Event"> | string;
     eventType?: Prisma.EnumEventTypeWithAggregatesFilter<"Event"> | $Enums.EventType;
     timestamp?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string;
 };
 export type EventCreateInput = {
     id?: string;
@@ -196,6 +208,7 @@ export type EventCreateInput = {
     message: string;
     eventType: $Enums.EventType;
     timestamp: Date | string;
+    createdAt?: Date | string;
 };
 export type EventUncheckedCreateInput = {
     id?: string;
@@ -204,6 +217,7 @@ export type EventUncheckedCreateInput = {
     message: string;
     eventType: $Enums.EventType;
     timestamp: Date | string;
+    createdAt?: Date | string;
 };
 export type EventUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -212,6 +226,7 @@ export type EventUpdateInput = {
     message?: Prisma.StringFieldUpdateOperationsInput | string;
     eventType?: Prisma.EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType;
     timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type EventUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -220,6 +235,7 @@ export type EventUncheckedUpdateInput = {
     message?: Prisma.StringFieldUpdateOperationsInput | string;
     eventType?: Prisma.EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType;
     timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type EventCreateManyInput = {
     id?: string;
@@ -228,6 +244,7 @@ export type EventCreateManyInput = {
     message: string;
     eventType: $Enums.EventType;
     timestamp: Date | string;
+    createdAt?: Date | string;
 };
 export type EventUpdateManyMutationInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -236,6 +253,7 @@ export type EventUpdateManyMutationInput = {
     message?: Prisma.StringFieldUpdateOperationsInput | string;
     eventType?: Prisma.EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType;
     timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type EventUncheckedUpdateManyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -244,6 +262,7 @@ export type EventUncheckedUpdateManyInput = {
     message?: Prisma.StringFieldUpdateOperationsInput | string;
     eventType?: Prisma.EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType;
     timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type EventCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -252,6 +271,7 @@ export type EventCountOrderByAggregateInput = {
     message?: Prisma.SortOrder;
     eventType?: Prisma.SortOrder;
     timestamp?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
 };
 export type EventMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -260,6 +280,7 @@ export type EventMaxOrderByAggregateInput = {
     message?: Prisma.SortOrder;
     eventType?: Prisma.SortOrder;
     timestamp?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
 };
 export type EventMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -268,6 +289,7 @@ export type EventMinOrderByAggregateInput = {
     message?: Prisma.SortOrder;
     eventType?: Prisma.SortOrder;
     timestamp?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
 };
 export type StringFieldUpdateOperationsInput = {
     set?: string;
@@ -285,6 +307,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     message?: boolean;
     eventType?: boolean;
     timestamp?: boolean;
+    createdAt?: boolean;
 }, ExtArgs["result"]["event"]>;
 export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -293,6 +316,7 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     message?: boolean;
     eventType?: boolean;
     timestamp?: boolean;
+    createdAt?: boolean;
 }, ExtArgs["result"]["event"]>;
 export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -301,6 +325,7 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     message?: boolean;
     eventType?: boolean;
     timestamp?: boolean;
+    createdAt?: boolean;
 }, ExtArgs["result"]["event"]>;
 export type EventSelectScalar = {
     id?: boolean;
@@ -309,8 +334,9 @@ export type EventSelectScalar = {
     message?: boolean;
     eventType?: boolean;
     timestamp?: boolean;
+    createdAt?: boolean;
 };
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "service" | "message" | "eventType" | "timestamp", ExtArgs["result"]["event"]>;
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "service" | "message" | "eventType" | "timestamp" | "createdAt", ExtArgs["result"]["event"]>;
 export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "Event";
     objects: {};
@@ -321,6 +347,7 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
         message: string;
         eventType: $Enums.EventType;
         timestamp: Date;
+        createdAt: Date;
     }, ExtArgs["result"]["event"]>;
     composites: {};
 };
@@ -681,6 +708,7 @@ export interface EventFieldRefs {
     readonly message: Prisma.FieldRef<"Event", 'String'>;
     readonly eventType: Prisma.FieldRef<"Event", 'EventType'>;
     readonly timestamp: Prisma.FieldRef<"Event", 'DateTime'>;
+    readonly createdAt: Prisma.FieldRef<"Event", 'DateTime'>;
 }
 /**
  * Event findUnique

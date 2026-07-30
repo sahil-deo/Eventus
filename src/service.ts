@@ -29,7 +29,7 @@ export async function getEventCount(req: Request, res: Response) {
 // CRUD 
 export async function getAllEvents(req: Request, res: Response) {
 
-    const { nextId } = req.query as z.infer<typeof EventsRequestSchema>
+    const { nextId } = res.locals.query as z.infer<typeof EventsRequestSchema>
 
     if (nextId !== undefined) {
         const exists = await prisma.event.findUnique({ where: { id: nextId } });
@@ -41,7 +41,7 @@ export async function getAllEvents(req: Request, res: Response) {
     const responseEvents = await prisma.event.findMany({
         take: 5,
         ...(nextId !== undefined && { skip: 1, cursor: { id: nextId } }),
-        orderBy: { timestamp: "desc" },
+        orderBy: { createdAt: "desc" },
     });
 
     const newNextId = responseEvents.length === 5 ? responseEvents[responseEvents.length - 1]?.id : undefined;

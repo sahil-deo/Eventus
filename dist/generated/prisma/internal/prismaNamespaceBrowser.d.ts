@@ -43,6 +43,7 @@ export declare const EventScalarFieldEnum: {
     readonly message: 'message';
     readonly eventType: 'eventType';
     readonly timestamp: 'timestamp';
+    readonly createdAt: 'createdAt';
 };
 export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum];
 export declare const SortOrder: {

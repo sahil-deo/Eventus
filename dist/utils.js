@@ -15,7 +15,7 @@ export function validateQuery(queryZod) {
         if (!result.success) {
             return res.status(400).json({ error: result.error.issues });
         }
-        req.query = result.data;
+        res.locals.query = result.data;
         next();
     };
 }
