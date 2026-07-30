@@ -1,4 +1,3 @@
-import type { Event } from "./model.js";
 import type { Request, Response, NextFunction } from "express";
 import { ZodType } from "zod";
 export declare function createEvent(data: any): Event;

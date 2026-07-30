@@ -1,31 +1,20 @@
 import "dotenv/config";
-import express from "express";
-import cors from "cors";
+
+import Router, { type Request, type Response } from "express";
+
 import { prisma } from "./db.js"
+
 import {
-    EventSchema,
     EventResponseSchema,
     EventsResponseSchema,
     EventsRequestSchema
 } from "./schema.js"
-import { validateBody } from "./utils.js"
 
-const app = express();
+export const eventRouter = Router();
 
-// Middleware 
-app.use(express.json());
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-}));
+// Helper 
 
-// Helper routes
-
-app.get("/health", (req, res) => {
-    res.status(200).json({ status: "ok" })
-})
-
-app.get("/events/util/count", async (req, res) => {
+export async function getEventCount(req: Request, res: Response) {
     try {
         const count = await prisma.event.count();
         res.status(200).json({ count });
@@ -33,13 +22,11 @@ app.get("/events/util/count", async (req, res) => {
         console.error(err);
         res.status(500).json({ error: "Unknown error" });
     }
-});
+}
 
 
-
-// CRUD Routes
-
-app.get("/events", async (req, res) => {
+// CRUD 
+export async function getAllEvents(req: Request, res: Response) {
 
     const query = req.query
     const queryResult = EventsRequestSchema.safeParse(query)
@@ -70,28 +57,28 @@ app.get("/events", async (req, res) => {
         return res.status(500).json({ error: result.error.issues });
     }
     res.status(200).json(response);
-})
+}
 
-app.get("/events/:id", async (req, res) => {
+export async function getEventById(req: Request, res: Response) {
     const id = String(req.params.id);
     const event = await prisma.event.findUnique({ where: { id: id } });
     if (!event) {
         return res.status(404).json({ error: "Event not found" })
     }
 
-    const result = await EventResponseSchema.safeParse(event)
+    const result = EventResponseSchema.safeParse(event)
     if (!result.success) {
         return res.status(500).json({ error: result.error.issues })
     }
     res.json(event)
-});
+}
 
-app.post("/events", validateBody(EventSchema), async (req, res) => {
+export async function createEvent(req: Request, res: Response) {
     const newEvent = await prisma.event.create({ data: req.body });
     res.status(201).json(newEvent);
-})
+}
 
-app.put("/events/:id", validateBody(EventSchema), async (req, res) => {
+export async function updateEvent(req: Request, res: Response) {
     const updatedEvent = await prisma.event
         .update({ where: { id: String(req.params.id) }, data: req.body, })
         .catch(() => null);
@@ -100,9 +87,9 @@ app.put("/events/:id", validateBody(EventSchema), async (req, res) => {
         return res.status(404).json({ error: "Event not found" });
     }
     res.status(200).json(updatedEvent);
-})
+}
 
-app.delete("/events/:id", async (req, res) => {
+export async function deleteEvent(req: Request, res: Response) {
     const id = String(req.params.id);
     const deleted = await prisma.event
         .delete({ where: { id: id } })
@@ -112,11 +99,4 @@ app.delete("/events/:id", async (req, res) => {
         return res.status(404).json({ error: "Event not found" });
     }
     res.status(200).json({ message: "deleted", event: "deleted" });
-});
-
-const PORT = 8000
-
-app.listen(PORT, () => {
-    console.log("Server started on port 8000")
-})
-
+}
