@@ -1,10 +1,5 @@
-import { randomUUID } from "crypto";
 import type { Request, Response, NextFunction } from "express"
-import { ZodType } from "zod"
-
-export function createEvent(data: any): Event {
-    return { id: randomUUID(), ...data };
-}
+import { z, ZodType } from "zod"
 
 export function validateBody(event: ZodType) {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -16,3 +11,15 @@ export function validateBody(event: ZodType) {
         next();
     }
 }
+
+export function validateQuery(queryZod: ZodType) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const result = queryZod.safeParse(req.query);
+        if (!result.success) {
+            return res.status(400).json({ error: result.error.issues });
+        }
+        req.query = result.data as any;
+        next();
+    }
+}
+

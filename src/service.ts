@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import Router, { type Request, type Response } from "express";
+import { z } from "zod";
 
 import { prisma } from "./db.js"
 
@@ -28,14 +29,8 @@ export async function getEventCount(req: Request, res: Response) {
 // CRUD 
 export async function getAllEvents(req: Request, res: Response) {
 
-    const query = req.query
-    const queryResult = EventsRequestSchema.safeParse(query)
+    const { nextId } = req.query as z.infer<typeof EventsRequestSchema>
 
-    if (!queryResult.success) {
-        return res.status(400).json({ error: queryResult.error.issues });
-    }
-
-    const nextId = queryResult.data.nextId;
     if (nextId !== undefined) {
         const exists = await prisma.event.findUnique({ where: { id: nextId } });
         if (!exists) {
@@ -46,7 +41,7 @@ export async function getAllEvents(req: Request, res: Response) {
     const responseEvents = await prisma.event.findMany({
         take: 5,
         ...(nextId !== undefined && { skip: 1, cursor: { id: nextId } }),
-        orderBy: { id: "desc" },
+        orderBy: { timestamp: "desc" },
     });
 
     const newNextId = responseEvents.length === 5 ? responseEvents[responseEvents.length - 1]?.id : undefined;

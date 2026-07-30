@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { eventRouter } from "./router.js";
+import { eventRouter } from "./routes.js";
 const app = express();
 // Middleware 
 app.use(express.json());
